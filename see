@@ -88,8 +88,6 @@ main() {
     # Try automatically finding urls
     local urls="$(get_videos "$url")"
 
-    echo "truc"
-
     if [[ -z "$urls" ]] ; then
         exit 1
     fi
