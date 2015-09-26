@@ -1,61 +1,103 @@
-#!/bin/sh
-set -e
+#!/bin/bash
+set -e -u
+
+#######################################
+# Configuration
+#######################################
 
 PLAYER=mpv
-URL=""
+DEBUG=false
+FORMATS="youtube .mp4 .avi"
 
-is() {
-    [[ "$URL" =~ $1 ]]
+#######################################
+# Extensions
+#######################################
+
+livecoding.tv() {
+    curl -s "$1" |\
+    tr '"' '\n'  |\
+    grep rtmp    |\
+    xargs "$PLAYER"
 }
 
-youtube_play() {
-    mpv "$@" || youtube-dl -g "$@" | xargs "$PLAYER"
+#######################################
+# Internals
+#######################################
+
+domain() {
+    sed -n '\|http|s|^https\?://\([^/]\+\)/.*$|\1|p' <<< "$1"
 }
 
-play() {
-    URL="$1"
+scheme() {
+    sed -n "\|://|s|^\([^:]\+\)://.*$|\1|p" <<< "$1"
+}
 
-    if is "tube8.com"; then
-        "$PLAYER" "$(wget -O- -q "$URL" | grep videoUrlJS | cut -d \" -f 2)"
+get_videos() {
+    content="$(curl -s "$1")"
 
-     elif is "youtube.com" || is "youtu.be"; then
-         youtube_play "$URL"
+    for format in $FORMATS ; do
+        echo "$content" |\
+        tr "'\"" "\n\n" |\
+        grep "$format"
+    done
+}
 
-    elif is "ocw.mit.edu"; then
-        wget -O- -q "$URL"    |\
-        tr "'" "\n"           |\
-        grep "youtube.com/v/" |\
-        youtube_play "$URL"
+normalize_url() {
+    sed "\|^[^/:][^:]\+$|s|^|/| ; \|^/|s|^|$(scheme "$1")://$(domain "$1")|"
+}
 
-    elif is "medias.ircam.fr"; then
-        tmp_url="$(wget -O- -q "$URL"  |\
-                   grep embed      |\
-                   head -1         |\
-                   cut -d \" -f 8 )"
-        wget -O- -q "$tmp_url" |\
-        grep webm              |\
-        cut -d '"' -f 2        |\
-        xargs "$PLAYER"
+unittests() {
+scheme "http://home/cym13/.home.html/"
+domain "http://home/cym13/.home.html/"
 
-    elif is "youporn.com"; then
-        wget -O- -q "$URL" |\
-        tr '"' '\n'        |\
-        grep videoSrc      |\
-        cut -d "'" -f 2    |\
-        xargs "$PLAYER"
+normalize_url "http://my_site.com/thingy/" <<EOF
+/a/video.mp4
+video.mp4
+http://my_site.com/a/video.mp4
+EOF
 
-    elif is "livecoding.tv"; then
-        wget -O- -q "$URL" |\
-        tr '"' '\n'        |\
-        grep rtmp          |\
-        xargs "$PLAYER"
+}
 
-    else
-        "$PLAYER" "$URL"
+main() {
+    if $DEBUG ; then
+        unittests
     fi
+
+    local url="${1:-""}"
+
+    # No arguments given
+    if [[ -z "$url" ]] ; then
+        echo "Usage: see URLS..."
+        exit 1
+    fi
+
+    # Try the extension function
+    if "$(domain "$url")" 2>/dev/null ; then
+        exit 0
+    fi
+
+    # Try with the default player
+    if "$PLAYER" "$url" ; then
+        exit 0
+    fi
+
+    if [[ -z "$(scheme "$url")" ]] ; then
+        exit 1
+    fi
+
+    # Try automatically finding urls
+    local urls="$(get_videos "$url")"
+
+    echo "truc"
+
+    if [[ -z "$urls" ]] ; then
+        exit 1
+    fi
+
+    uniq <<<"$urls"      |\
+    normalize_url "$url" |\
+    tr "\n" "\0"         |\
+    xargs -0 "$PLAYER"
 }
 
-for i in `seq "$#"` ; do
-    play "$1"
-    shift
-done
+main "$@"
