@@ -1,0 +1,61 @@
+#!/bin/sh
+set -e
+
+PLAYER=mpv
+URL=""
+
+is() {
+    [[ "$URL" =~ $1 ]]
+}
+
+youtube_play() {
+    mpv "$@" || youtube-dl -g "$@" | xargs "$PLAYER"
+}
+
+play() {
+    URL="$1"
+
+    if is "tube8.com"; then
+        "$PLAYER" "$(wget -O- -q "$URL" | grep videoUrlJS | cut -d \" -f 2)"
+
+     elif is "youtube.com" || is "youtu.be"; then
+         youtube_play "$URL"
+
+    elif is "ocw.mit.edu"; then
+        wget -O- -q "$URL"    |\
+        tr "'" "\n"           |\
+        grep "youtube.com/v/" |\
+        youtube_play "$URL"
+
+    elif is "medias.ircam.fr"; then
+        tmp_url="$(wget -O- -q "$URL"  |\
+                   grep embed      |\
+                   head -1         |\
+                   cut -d \" -f 8 )"
+        wget -O- -q "$tmp_url" |\
+        grep webm              |\
+        cut -d '"' -f 2        |\
+        xargs "$PLAYER"
+
+    elif is "youporn.com"; then
+        wget -O- -q "$URL" |\
+        tr '"' '\n'        |\
+        grep videoSrc      |\
+        cut -d "'" -f 2    |\
+        xargs "$PLAYER"
+
+    elif is "livecoding.tv"; then
+        wget -O- -q "$URL" |\
+        tr '"' '\n'        |\
+        grep rtmp          |\
+        xargs "$PLAYER"
+
+    else
+        "$PLAYER" "$URL"
+    fi
+}
+
+for i in `seq "$#"` ; do
+    play "$1"
+    shift
+done
