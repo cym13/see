@@ -7,7 +7,7 @@ set -e -u
 
 PLAYER=mpv
 DEBUG=false
-FORMATS="youtube.com \.mp4 \.avi"
+FORMATS="youtube.com \.mp4 \.avi \.webm"
 
 #######################################
 # Extensions
