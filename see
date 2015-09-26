@@ -7,7 +7,7 @@ set -e -u
 
 PLAYER=mpv
 DEBUG=false
-FORMATS="youtube .mp4 .avi"
+FORMATS="youtube.com \.mp4 \.avi"
 
 #######################################
 # Extensions
