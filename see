@@ -5,13 +5,20 @@ set -e -u
 # Configuration
 #######################################
 
+# What video player do you want to use?
 PLAYER=mpv
-DEBUG=false
+
+# What format will be recognized as possible embeded videos
 FORMATS="youtube.com \.mp4 \.avi \.webm"
+
+# Should we launch some tests?
+DEBUG=false
 
 #######################################
 # Extensions
 #######################################
+# Used to perform domain specific actions, just define a function whose name
+# is the target domain and it will be executed with maximum priority.
 
 livecoding.tv() {
     curl -s "$1" |\
@@ -46,7 +53,8 @@ normalize_url() {
     sed "\|^[^/:][^:]\+$|s|^|/| ; \|^/|s|^|$(scheme "$1")://$(domain "$1")|"
 }
 
-unittests() {
+# Some debug tests, not exactly unittests but useful for debugging
+tests() {
 scheme "http://home/cym13/.home.html/"
 domain "http://home/cym13/.home.html/"
 
@@ -60,7 +68,7 @@ EOF
 
 main() {
     if $DEBUG ; then
-        unittests
+        tests
     fi
 
     local url="${1:-""}"
@@ -81,11 +89,12 @@ main() {
         exit 0
     fi
 
+    # If it isn't a url, quit
     if [[ -z "$(scheme "$url")" ]] ; then
         exit 1
     fi
 
-    # Try automatically finding urls
+    # Try automatically finding embeded urls
     local urls="$(get_videos "$url")"
 
     if [[ -z "$urls" ]] ; then
