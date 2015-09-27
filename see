@@ -77,7 +77,7 @@ main() {
         exit 1
     fi
 
-    for i in {0..$#} shit ; do
+    for i in `seq $#` ; do
         url="$1"
 
         # Try the extension function
