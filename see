@@ -14,6 +14,9 @@ FORMATS="youtube.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \.ogm \.flac"
 # Should we launch some tests?
 DEBUG=false
 
+# Torrent player command
+P2PLAYER="peerflix -k"
+
 #######################################
 # Extensions
 #######################################
@@ -92,8 +95,10 @@ main() {
             continue
         fi
 
-        # If it isn't a url, quit
+        # If it isn't a url, maybe it's a magnet link
+        # Either way we quit here
         if [[ -z "$(scheme "$url")" ]] ; then
+            $P2PLAYER "$url"
             shift
             continue
         fi
