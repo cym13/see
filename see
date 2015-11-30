@@ -9,7 +9,8 @@ set -e -u
 PLAYER=mpv
 
 # What format will be recognized as possible embeded videos
-FORMATS="youtube.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \.ogm \.flac"
+FORMATS="youtube.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \.ogm \.flac \
+         \.mkv"
 
 # Should we launch some tests?
 DEBUG=false
