@@ -93,7 +93,7 @@ main() {
         url="$1"
 
         # Try the extension function
-        if "$(domain "$url")" 2>/dev/null ; then
+        if "$(domain "$url")" "$url" 2>/dev/null ; then
             shift
             continue
         fi
