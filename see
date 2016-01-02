@@ -69,7 +69,9 @@ not_url() {
     if [[ -z "$(scheme "$1")" ]] ; then
         # Maybe it's a magnet link?
         $P2PLAYER "$1"
+        return 0
     fi
+    return 1
 }
 
 torrent() {
@@ -78,9 +80,9 @@ torrent() {
         wget "$1" -O "$f"
         $P2PLAYER "$f"
         rm -f "$f"
-        return 1
+        return 0
     fi
-    return 0
+    return 1
 }
 
 # Some debug tests, not exactly unittests but useful for debugging
