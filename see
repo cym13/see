@@ -27,14 +27,14 @@ P2PLAYER="peerflix -k"
 livecoding.tv() {
     curl -s "$1" |\
     tr '"' '\n'  |\
-    grep rtmp    |\
+    grep -a rtmp |\
     xargs "$PLAYER"
 }
 
 kat.cr() {
     curl -s --compressed "$1" |\
     tr '"' '\n'               |\
-    grep "^magnet:"           |\
+    grep -a "^magnet:"        |\
     head -1                   |\
     xargs $P2PLAYER
 }
@@ -57,7 +57,7 @@ get_videos() {
     for format in $FORMATS ; do
         echo "$content" |\
         tr "'\"" "\n\n" |\
-        grep "$format"
+        grep -a "$format"
     done
 }
 
