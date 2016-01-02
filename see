@@ -65,6 +65,13 @@ normalize_url() {
     sed "\|^[^/:][^:]\+$|s|^|/| ; \|^/|s|^|$(scheme "$1")://$(domain "$1")|"
 }
 
+not_url() {
+    if [[ -z "$(scheme "$1")" ]] ; then
+        # Maybe it's a magnet link?
+        $P2PLAYER "$1"
+    fi
+}
+
 torrent() {
     if grep -q ".torrent$" <<< "$1" ; then
         f="$(mktemp)"
@@ -74,12 +81,6 @@ torrent() {
         return 1
     fi
     return 0
-}
-
-magnet() {
-    if [[ -z "$(scheme "$1")" ]] ; then
-        $P2PLAYER "$1"
-    fi
 }
 
 # Some debug tests, not exactly unittests but useful for debugging
@@ -115,7 +116,7 @@ main() {
         if "$(domain "$url")" "$url" 2>/dev/null \
         || torrent   "$url"                      \
         || "$PLAYER" "$url"                      \
-        || magnet    "$url"                      \
+        || not_url   "$url"                      \
         || [[ -z "$urls" ]]
         then
             shift
