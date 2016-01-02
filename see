@@ -76,6 +76,12 @@ torrent() {
     return 0
 }
 
+magnet() {
+    if [[ -z "$(scheme "$1")" ]] ; then
+        $P2PLAYER "$1"
+    fi
+}
+
 # Some debug tests, not exactly unittests but useful for debugging
 tests() {
 scheme "http://home/cym13/.home.html/"
@@ -101,38 +107,17 @@ main() {
     fi
 
     for i in `seq $#` ; do
-        url="$1"
-
-        # Try the extension function
-        if "$(domain "$url")" "$url" 2>/dev/null ; then
-            shift
-            continue
-        fi
-
-        # Is it a torrent file?
-        if torrent "$url" ; then
-            shift
-            continue
-        fi
-
-        # Try with the default player
-        if "$PLAYER" "$url" ; then
-            shift
-            continue
-        fi
-
-        # If it isn't a url, maybe it's a magnet link
-        # Either way we quit here
-        if [[ -z "$(scheme "$url")" ]] ; then
-            $P2PLAYER "$url"
-            shift
-            continue
-        fi
+        local url="$1"
 
         # Try automatically finding embeded urls
         local urls="$(get_videos "$url")"
 
-        if [[ -z "$urls" ]] ; then
+        if "$(domain "$url")" "$url" 2>/dev/null \
+        || torrent   "$url"                      \
+        || "$PLAYER" "$url"                      \
+        || magnet    "$url"                      \
+        || [[ -z "$urls" ]]
+        then
             shift
             continue
         fi
