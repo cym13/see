@@ -65,6 +65,17 @@ normalize_url() {
     sed "\|^[^/:][^:]\+$|s|^|/| ; \|^/|s|^|$(scheme "$1")://$(domain "$1")|"
 }
 
+torrent() {
+    if grep -q ".torrent$" <<< "$1" ; then
+        f="$(mktemp)"
+        wget "$1" -O "$f"
+        $P2PLAYER "$f"
+        rm -f "$f"
+        return 1
+    fi
+    return 0
+}
+
 # Some debug tests, not exactly unittests but useful for debugging
 tests() {
 scheme "http://home/cym13/.home.html/"
@@ -94,6 +105,12 @@ main() {
 
         # Try the extension function
         if "$(domain "$url")" "$url" 2>/dev/null ; then
+            shift
+            continue
+        fi
+
+        # Is it a torrent file?
+        if torrent "$url" ; then
             shift
             continue
         fi
