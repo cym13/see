@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e -u
+set -u
 
 #######################################
 # Configuration
@@ -122,7 +122,7 @@ main() {
         fi
 
         # Try automatically finding embeded urls
-        urls="$(get_videos "$url")"
+        local urls="$(get_videos "$url")"
 
         if [[ -z "$urls" ]] ; then
             shift
