@@ -112,15 +112,19 @@ main() {
     for i in `seq $#` ; do
         local url="$1"
 
-        # Try automatically finding embeded urls
-        local urls="$(get_videos "$url")"
-
         if "$(domain "$url")" "$url" 2>/dev/null \
         || torrent   "$url"                      \
         || "$PLAYER" "$url"                      \
-        || not_url   "$url"                      \
-        || [[ -z "$urls" ]]
+        || not_url   "$url"
         then
+            shift
+            continue
+        fi
+
+        # Try automatically finding embeded urls
+        urls="$(get_videos "$url")"
+
+        if [[ -z "$urls" ]] ; then
             shift
             continue
         fi
