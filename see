@@ -52,7 +52,7 @@ scheme() {
 }
 
 get_videos() {
-    content="$(curl --compressed -s "$1")"
+    content="$(curl --compressed -L -s "$1")"
 
     for format in $FORMATS ; do
         echo "$content" |\
