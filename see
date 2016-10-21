@@ -7,6 +7,7 @@ set -u
 
 # What video player do you want to use?
 PLAYER=mpv
+PLAYER_FLAGS=''
 
 # What format will be recognized as possible embeded videos
 FORMATS="youtube.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \.ogm \.flac \
@@ -24,19 +25,25 @@ P2PLAYER="peerflix -k"
 # Used to perform domain specific actions, just define a function whose name
 # is the target domain and it will be executed with maximum priority.
 
+www.youtube.com() {
+    "$PLAYER" $PLAYER_FLAGS                                  \
+              --ytdl-format='[protocol!=http_dash_segments]' \
+              "$1"
+}
+
 livecoding.tv() {
-    curl -s "$1" |\
-    tr '"' '\n'  |\
-    grep -a rtmp |\
-    xargs "$PLAYER"
+    curl -s "$1"   \
+    | tr '"' '\n'  \
+    | grep -a rtmp \
+    | xargs "$PLAYER" $PLAYER_FLAGS
 }
 
 kat.cr() {
-    curl -s --compressed "$1" |\
-    tr '"' '\n'               |\
-    grep -a "^magnet:"        |\
-    head -1                   |\
-    xargs $P2PLAYER
+    curl -s --compressed "$1" \
+    | tr '"' '\n'             \
+    | grep -a "^magnet:"      \
+    | head -1                 \
+    | xargs $P2PLAYER
 }
 
 #######################################
@@ -55,9 +62,9 @@ get_videos() {
     content="$(curl --compressed -L -s "$1")"
 
     for format in $FORMATS ; do
-        echo "$content" |\
-        tr "'\"" "\n\n" |\
-        grep -a "$format"
+        echo "$content"   \
+        | tr "'\"" "\n\n" \
+        | grep -a "$format"
     done
 }
 
@@ -109,12 +116,17 @@ main() {
         exit 1
     fi
 
+    if [[ "$1" = "-f" ]] ; then
+        PLAYER_FLAGS="$PLAYER_FLAGS --fullscreen"
+        shift
+    fi
+
     for i in `seq $#` ; do
         local url="$1"
 
         if "$(domain "$url")" "$url" 2>/dev/null \
         || torrent   "$url"                      \
-        || "$PLAYER" "$url"                      \
+        || "$PLAYER" $PLAYER_FLAGS "$url"        \
         || not_url   "$url"
         then
             shift
@@ -129,10 +141,10 @@ main() {
             continue
         fi
 
-        uniq <<<"$urls"      |\
-        normalize_url "$url" |\
-        tr "\n" "\0"         |\
-        xargs -0 "$PLAYER"
+        uniq <<<"$urls"         \
+        | normalize_url "$url" \
+        | tr "\n" "\0"         \
+        | xargs -0 "$PLAYER" $PLAYER_FLAGS
 
         shift
     done
