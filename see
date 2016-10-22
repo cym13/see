@@ -25,6 +25,15 @@ P2PLAYER="peerflix -k"
 # Used to perform domain specific actions, just define a function whose name
 # is the target domain and it will be executed with maximum priority.
 
+www.dailymotion.com() {
+    get_videos "$1"           \
+    | grep ".*\.mp4?"         \
+    | tail -1                 \
+    | sed 's/\\//g'           \
+    | xargs wget --quiet -O-  \
+    | "$PLAYER" $PLAYER_FLAGS -
+}
+
 www.youtube.com() {
     "$PLAYER" $PLAYER_FLAGS                                  \
               --ytdl-format='[protocol!=http_dash_segments]' \
