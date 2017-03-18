@@ -73,7 +73,7 @@ get_videos() {
     for format in $FORMATS ; do
         echo "$content"   \
         | tr "'\"" "\n\n" \
-        | grep -a "$format"
+        | grep -a -e "${format}[^\.]" -e "${format}$"
     done
 }
 
