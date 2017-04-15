@@ -55,6 +55,14 @@ kat.cr() {
     | xargs $P2PLAYER
 }
 
+hentaistream.com() {
+    curl -s "$1"            \
+    | qgrep "^http.*s11_"   \
+    | xargs curl -s         \
+    | qgrep "\(mp4\|avi\)$" \
+    | xargs $PLAYER
+}
+
 #######################################
 # Internals
 #######################################
