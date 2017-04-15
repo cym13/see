@@ -101,6 +101,10 @@ torrent() {
     return 1
 }
 
+qgrep() {
+    tr \'\" "\n\n" | grep "$@"
+}
+
 # Some debug tests, not exactly unittests but useful for debugging
 tests() {
 scheme "http://home/cym13/.home.html/"
