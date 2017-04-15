@@ -60,7 +60,7 @@ hentaistream.com() {
     | qgrep "^http.*s11_"   \
     | xargs curl -s         \
     | qgrep "\(mp4\|avi\)$" \
-    | xargs $PLAYER
+    | xargs $PLAYER $PLAYER_FLAGS
 }
 
 #######################################
