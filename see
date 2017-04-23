@@ -132,7 +132,7 @@ main() {
     fi
 
     # No arguments given
-    if [[ -z "${@:-''}" ]] ; then
+    if [[ "$#" -eq 0 ]] ; then
         echo "Usage: see URLS..."
         exit 1
     fi
@@ -142,7 +142,7 @@ main() {
         shift
     fi
 
-    for i in `seq $#` ; do
+    for _ in `seq $#` ; do
         local url="$1"
 
         if "$(domain "$url")" "$url" 2>/dev/null \
