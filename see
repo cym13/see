@@ -85,7 +85,8 @@ get_videos() {
     for format in $FORMATS ; do
         echo "$content"   \
         | tr "'\"" "\n\n" \
-        | grep -a -e "${format}[^\.]" -e "${format}$"
+        | grep -a -e "${format}[^\.]" -e "${format}$" \
+        | sed 's|\\/|/|g'
     done
 }
 
