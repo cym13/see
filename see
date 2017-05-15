@@ -44,6 +44,14 @@ youtu.be() {
     return www.youtube.com "$1"
 }
 
+www.anime1.com() {
+    curl -s "$1"    \
+    | tr '"' '\n'   \
+    | grep "\.mp4?" \
+    | tr '\n' '\0'  \
+    | xargs -0 "$PLAYER" $PLAYER_FLAGS
+}
+
 livecoding.tv() {
     curl -s "$1"   \
     | tr '"' '\n'  \
