@@ -11,7 +11,7 @@ PLAYER_FLAGS=''
 
 # What format will be recognized as possible embeded videos
 FORMATS="youtube.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \.ogm \.flac \
-         \.mkv \.m3u8 magnet: youtu.be"
+         \.mkv \.m3u8 magnet: youtu.be vimeo\.com"
 
 # Should we launch some tests?
 DEBUG=false
