@@ -68,10 +68,10 @@ kat.cr() {
 }
 
 hentaistream.com() {
-    curl -s "$1"                    \
-    | qgrep "^http.*/frames/"       \
-    | xargs curl -s                 \
-    | qgrep "\(mp4\|avi\)\(\W\|$\)" \
+    curl -s "$1"               \
+    | qgrep "^http.*/frames/"  \
+    | xargs curl -s            \
+    | qgrep "\.\(mp4\|avi\)"   \
     | xargs $PLAYER $PLAYER_FLAGS
 }
 
