@@ -27,8 +27,11 @@ the source code.
 Dependencies
 ============
 
-This script uses curl and depends on an external video player. I reccommend
+This script uses curl and depends on an external video player. I recommend
 mpv for this purpose.
+
+It also relies on nodejs for websites that dynamically build urls although it
+is quite uncommon.
 
 License
 =======

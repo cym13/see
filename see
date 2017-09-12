@@ -75,6 +75,23 @@ hentaistream.com() {
     | xargs $PLAYER $PLAYER_FLAGS
 }
 
+hentaihaven.org() {
+    cookie="$(curl -s "$1"                                            \
+            | grep "<script>"                                         \
+            | cut -d "'" -f 4                                         \
+            | base64 -d                                               \
+            | sed 's/document.cookie/var document_cookie/'            \
+            | sed 's/location.reload()/console.log(document_cookie)/' \
+            | node)"
+
+    curl -s "$1" -b "$cookie" \
+    | gunzip                  \
+    | qgrep "hh\.cx.*\.mp4$"  \
+    | while read line ; do
+        $PLAYER $PLAYER_FLAGS "$line" && break
+    done
+}
+
 #######################################
 # Internals
 #######################################
