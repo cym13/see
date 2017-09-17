@@ -84,8 +84,7 @@ hentaihaven.org() {
             | sed 's/location.reload()/console.log(document_cookie)/' \
             | node)"
 
-    curl -s "$1" -b "$cookie" \
-    | gunzip                  \
+    curl -s --compressed "$1" -b "$cookie" \
     | qgrep "hh\.cx.*\.mp4$"  \
     | grep -v "preroll"       \
     | while read line ; do
