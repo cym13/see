@@ -76,7 +76,7 @@ hentaihaven.org() {
             | node)"
 
     curl -s --compressed "$1" -b "$cookie" \
-    | qgrep "hh\.cx.*\.mp4$"  \
+    | qgrep "hh\.cx/files/%.*\.mp4$"  \
     | grep -v "preroll"       \
     | while read line ; do
         $PLAYER $PLAYER_FLAGS "$line" && break
