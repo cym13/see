@@ -63,7 +63,7 @@ hentaistream.com() {
     | qgrep "^http.*/frames/"  \
     | xargs curl -s            \
     | qgrep "\(\.\(mp4\|avi\)\|googleusercontent\)"   \
-    | xargs $PLAYER $PLAYER_FLAGS
+    | xargs "$PLAYER" $PLAYER_FLAGS
 }
 
 hentaihaven.org() {
@@ -79,7 +79,7 @@ hentaihaven.org() {
     | qgrep "hh\.cx/files/.*HH.*\.mp4$"  \
     | grep -v "preroll"       \
     | while read line ; do
-        $PLAYER $PLAYER_FLAGS "$line" && break
+        "$PLAYER" $PLAYER_FLAGS "$line" && break
     done
 }
 
