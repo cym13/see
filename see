@@ -83,6 +83,13 @@ hentaihaven.org() {
     done
 }
 
+www.mlpstream.org() {
+    curl -s "$1" \
+    | qgrep mkv  \
+    | head -1    \
+    | xargs "$PLAYER" $PLAYER_FLAGS
+}
+
 #######################################
 # Internals
 #######################################
