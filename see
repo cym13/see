@@ -7,7 +7,7 @@ set -u
 
 # What video player do you want to use?
 PLAYER=mpv
-PLAYER_FLAGS=''
+PLAYER_FLAGS='--force-seekable=yes'
 
 # What format will be recognized as possible embeded videos
 FORMATS="youtube.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \.ogm \.flac \
@@ -75,9 +75,10 @@ hentaihaven.org() {
             | sed 's/location.reload()/console.log(document_cookie)/' \
             | node)"
 
-    curl -s --compressed "$1" -b "$cookie" \
-    | qgrep "hh\.cx/files/.*HH.*\.mp4$"  \
-    | grep -v "preroll"       \
+    curl -s --compressed "$1" -b "$cookie"       \
+    | qgrep "hh\.cx/files/.*\(HH\|HD\).*\.mp4$"  \
+    | grep -v "preroll"                          \
+    | sort -u                                    \
     | while read line ; do
         "$PLAYER" $PLAYER_FLAGS "$line" && break
     done
