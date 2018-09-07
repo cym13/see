@@ -91,22 +91,6 @@ www.mlpstream.org() {
     | xargs "$PLAYER" $PLAYER_FLAGS
 }
 
-www.tube8.com() {
-    vurl=""
-    for i in {1..30} ; do
-        echo -n '.'
-        vurl="$(curl -s "$1" \
-               | grep "videoUrlJS" \
-               | cut -d '"' -f 2  \
-               | grep "&ttl=")"
-        if [ -n "$vurl" ] ; then
-            break
-        fi
-    done
-    echo
-    echo "$vurl" | xargs "$PLAYER" $PLAYER_FLAGS
-}
-
 #######################################
 # Internals
 #######################################
