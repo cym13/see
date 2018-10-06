@@ -155,6 +155,10 @@ EOF
 
 }
 
+unescape_url() {
+    sed 'p ; s/\&amp;/\&/g'
+}
+
 main() {
     if $DEBUG ; then
         tests
@@ -191,8 +195,9 @@ main() {
             continue
         fi
 
-        uniq <<<"$urls"         \
+        uniq <<<"$urls"        \
         | normalize_url "$url" \
+        | unescape_url "$url"  \
         | tr "\n" "\0"         \
         | xargs -0 "$PLAYER" $PLAYER_FLAGS
 
