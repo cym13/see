@@ -91,6 +91,14 @@ www.mlpstream.org() {
     | xargs "$PLAYER" $PLAYER_FLAGS
 }
 
+www.xanimeporn.com() {
+    curl -s "$1"    \
+    | tr ';' '\n'   \
+    | grep play.mp4 \
+    | tr -d '\\'    \
+    | xargs "$PLAYER" $PLAYER_FLAGS
+}
+
 #######################################
 # Internals
 #######################################
