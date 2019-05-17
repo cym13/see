@@ -67,7 +67,7 @@ hentaistream.com() {
 }
 
 hentaihaven.org() {
-    cookie="$(curl -s "$1"                                            \
+    cookie="$(curl -sL "$1"                                            \
             | grep "<script>"                                         \
             | cut -d "'" -f 4                                         \
             | base64 -d                                               \
@@ -75,7 +75,9 @@ hentaihaven.org() {
             | sed 's/location.reload()/console.log(document_cookie)/' \
             | node)"
 
-    curl -s --compressed "$1" -b "$cookie"       \
+    echo "$cookie"
+
+    curl -sL --compressed "$1" -b "$cookie"       \
     | qgrep "hh\.cx/files/.*\(HH\|HD\).*\.mp4$"  \
     | grep -v "preroll"                          \
     | sort -u                                    \
