@@ -26,8 +26,8 @@ P2PLAYER="peerflix -k"
 # is the target domain and it will be executed with maximum priority.
 
 www.youtube.com() {
-    "$PLAYER" $PLAYER_FLAGS                                  \
-              --ytdl-format='[protocol!=http_dash_segments]' \
+    "$PLAYER" $PLAYER_FLAGS                                              \
+              --ytdl-format='[protocol!=http_dash_segments],bestquality' \
               "$1"
 }
 
