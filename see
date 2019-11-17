@@ -25,16 +25,6 @@ P2PLAYER="peerflix -k"
 # Used to perform domain specific actions, just define a function whose name
 # is the target domain and it will be executed with maximum priority.
 
-www.youtube.com() {
-    "$PLAYER" $PLAYER_FLAGS                                              \
-              --ytdl-format='[protocol!=http_dash_segments],bestquality' \
-              "$1"
-}
-
-youtu.be() {
-    return www.youtube.com "$1"
-}
-
 www.anime1.com() {
     curl -s "$1"    \
     | tr '"' '\n'   \
