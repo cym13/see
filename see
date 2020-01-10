@@ -178,6 +178,8 @@ main() {
     for _ in `seq $#` ; do
         local url="$1"
 
+        echo "$url"
+
         if "$(domain "$url")" "$url" 2>/dev/null \
         || torrent   "$url"                      \
         || "$PLAYER" $PLAYER_FLAGS "$url"        \
