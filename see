@@ -7,7 +7,7 @@ set -u
 
 # What video player do you want to use?
 PLAYER=mpv
-PLAYER_FLAGS='--ytdl-format=best --force-seekable=yes --slang=en,enUS,fr,frFR'
+PLAYER_FLAGS='--force-seekable=yes --slang=en,enUS,fr,frFR'
 
 # What format will be recognized as possible embeded videos
 FORMATS="youtube.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \.ogm \.flac \
