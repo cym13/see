@@ -27,7 +27,7 @@ P2PLAYER="peerflix -k"
 
 www.youtube.com() {
     #"$PLAYER" $PLAYER_FLAGS "$1"
-    format="$(find_format "$1")"
+    format="$(find_yt_format "$1")"
     "$PLAYER" $PLAYER_FLAGS --ytdl-format="$format" "$1"
 }
 
@@ -169,7 +169,7 @@ unescape_url() {
     sed 'p ; s/\&amp;/\&/g'
 }
 
-find_format() {
+find_yt_format() {
     formats="$(youtube-dl -F "$1")"
     if grep -q "Unsupported URL" <<< "$formats" ; then
         echo "best"
@@ -177,13 +177,15 @@ find_format() {
     fi
 
     video_format="$(echo "$formats" \
-                    | grep "\s1280x720\s.*video only" \
+                    | grep 'video only' \
                     | cut -d ' ' -f 1 \
-                    | head -n 1)"
+                    | tac \
+                    | sed -n 2p)"
 
     audio_format="$(echo "$formats" \
                     | grep "audio only" \
                     | cut -d ' ' -f 1 \
+                    | tac \
                     | sed -n 2p)"
 
     echo "$video_format+$audio_format"
