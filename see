@@ -7,7 +7,7 @@ set -u
 
 # What video player do you want to use?
 PLAYER=mpv
-PLAYER_FLAGS='--ytdl-format=best --force-seekable=yes --slang=en,enUS,fr,frFR'
+PLAYER_FLAGS='--force-seekable=yes --slang=en,enUS,fr,frFR'
 
 # What format will be recognized as possible embeded videos
 FORMATS="youtube.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \.ogm \.flac \
@@ -24,6 +24,16 @@ P2PLAYER="peerflix -k"
 #######################################
 # Used to perform domain specific actions, just define a function whose name
 # is the target domain and it will be executed with maximum priority.
+
+www.youtube.com() {
+    #"$PLAYER" $PLAYER_FLAGS "$1"
+    format="$(find_format "$1")"
+    "$PLAYER" $PLAYER_FLAGS --ytdl-format="$format" "$1"
+}
+
+youtu.be() {
+    www.youtube.com "$1"
+}
 
 www.anime1.com() {
     curl -s "$1"    \
@@ -157,6 +167,26 @@ EOF
 
 unescape_url() {
     sed 'p ; s/\&amp;/\&/g'
+}
+
+find_format() {
+    formats="$(youtube-dl -F "$1")"
+    if grep -q "Unsupported URL" <<< "$formats" ; then
+        echo "best"
+        return
+    fi
+
+    video_format="$(echo "$formats" \
+                    | grep "\s1280x720\s.*video only" \
+                    | cut -d ' ' -f 1 \
+                    | head -n 1)"
+
+    audio_format="$(echo "$formats" \
+                    | grep "audio only" \
+                    | cut -d ' ' -f 1 \
+                    | sed -n 2p)"
+
+    echo "$video_format+$audio_format"
 }
 
 main() {
