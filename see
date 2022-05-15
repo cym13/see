@@ -35,6 +35,16 @@ youtu.be() {
     www.youtube.com "$1"
 }
 
+www.chess.com() {
+    curl -s "$1" \
+    | tr ';' '\n' \
+    | grep media.chesscomfiles.com \
+    | head -1 \
+    | cut -d '&' -f 1 \
+    | tr -d '\n' \
+    | xargs -0 "$PLAYER" $PLAYER_FLAGS
+}
+
 www.anime1.com() {
     curl -s "$1"    \
     | tr '"' '\n'   \
@@ -177,10 +187,17 @@ find_yt_format() {
     fi
 
     video_format="$(echo "$formats" \
-                    | grep 'video only' \
+                    | grep '1280x.*video only' \
                     | cut -d ' ' -f 1 \
-                    | tac \
-                    | sed -n 2p)"
+                    | head -n 1)"
+
+    if [ -z "$video_format" ] ; then
+        video_format="$(echo "$formats" \
+                        | grep 'video only' \
+                        | cut -d ' ' -f 1 \
+                        | tac \
+                        | sed -n 2p)"
+    fi
 
     audio_format="$(echo "$formats" \
                     | grep "audio only" \
