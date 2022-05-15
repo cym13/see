@@ -68,24 +68,35 @@ hentaistream.com() {
     | xargs "$PLAYER" $PLAYER_FLAGS
 }
 
-hentaihaven.org() {
-    cookie="$(curl -sL "$1"                                            \
-            | grep "<script>"                                         \
-            | cut -d "'" -f 4                                         \
-            | base64 -d                                               \
-            | sed 's/document.cookie/var document_cookie/'            \
-            | sed 's/location.reload()/console.log(document_cookie)/' \
-            | node)"
+hentaihaven.com() {
+    vidhash="$(curl -s "$1" \
+             | qgrep nhplayer.com \
+             | xargs curl -s \
+             | qgrep htstreaming \
+             | cut -d / -f 5)"
 
-    echo "$cookie"
+    # Get subs, not perfect but works on many
+    suburl="$(curl -s "$1" \
+            | grep "<h1 .*</h1>" \
+            | sed 's/^.*<h1[^>]\+>\([^<]\+\)<.*/\1/' \
+            | sed 's/[,:]//g' \
+            | sed 's/!/%21/g' \
+            | sed 's/$/ English Subbed.vtt/' \
+            | sed 's/ /%20/g' \
+            | sed 's|^|https://cdn.htstreaming.com/english/|')"
 
-    curl -sL --compressed "$1" -b "$cookie"       \
-    | qgrep "hh\.cx/files/.*\(HH\|HD\).*\.mp4$"  \
-    | grep -v "preroll"                          \
-    | sort -u                                    \
-    | while read line ; do
-        "$PLAYER" $PLAYER_FLAGS "$line" && break
-    done
+    subtmp="$(mktemp --suffix=".vtt")"
+    curl -s "$suburl" > "$subtmp"
+
+    curl -s "https://htstreaming.com/player/index.php?data=$vidhash&do=getVideo" \
+         -d "hash=$vidhash" \
+         -H "X-Requested-With: XMLHttpRequest" \
+    | jq -r ".videoSource" \
+    | xargs curl -s \
+    | tail -1 \
+    | xargs "$PLAYER" $PLAYER_FLAGS --sub-files="$subtmp"
+
+    rm "$subtmp"
 }
 
 www.mlpstream.org() {
