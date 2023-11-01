@@ -8,6 +8,7 @@ set -u
 # What video player do you want to use?
 PLAYER=mpv
 PLAYER_FLAGS='--force-seekable=yes --slang=en,enUS,fr,frFR'
+MONO_FLAG="--audio-channels=mono"
 
 # What format will be recognized as possible embeded videos
 FORMATS="youtube.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \.ogm \.flac \
@@ -26,7 +27,9 @@ P2PLAYER="peerflix -k"
 # is the target domain and it will be executed with maximum priority.
 
 www.youtube.com() {
-    "$PLAYER" $PLAYER_FLAGS --ytdl-format="22,best" "$1"
+    "$PLAYER" $PLAYER_FLAGS --ytdl-format="22" "$1" \
+    || "$PLAYER" $PLAYER_FLAGS --ytdl-format="best" "$1" \
+    || "$PLAYER" $PLAYER_FLAGS "$1"
 }
 
 youtu.be() {
@@ -112,6 +115,16 @@ www.xanimeporn.com() {
     | xargs "$PLAYER" $PLAYER_FLAGS
 }
 
+www.pornhub.com() {
+    youtube-dl -o - "$1" | "$PLAYER" $PLAYER_FLAGS - \
+    || "$PLAYER" $PLAYER_FLAGS "$1"
+}
+
+www.crunchyroll.com() {
+    format="$(youtube-dl -F "$1" | grep 1280x720 | cut -d ' ' -f 1)"
+    "$PLAYER" --ytdl-format="$format" $PLAYER_FLAGS "$1"
+}
+
 #######################################
 # Internals
 #######################################
@@ -193,6 +206,11 @@ main() {
 
     if [[ "$1" = "-f" ]] ; then
         PLAYER_FLAGS="$PLAYER_FLAGS --fullscreen"
+        shift
+    fi
+
+    if [[ "$1" = "-m" ]] ; then
+        PLAYER_FLAGS="$PLAYER_FLAGS $MONO_FLAG"
         shift
     fi
 
