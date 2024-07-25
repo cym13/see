@@ -11,8 +11,8 @@ PLAYER_FLAGS='--force-seekable=yes --slang=en,enUS,fr,frFR'
 MONO_FLAG="--audio-channels=mono"
 
 # What format will be recognized as possible embeded videos
-FORMATS="youtube.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \.ogm \.flac \
-         \.mkv \.m3u8 magnet: youtu.be vimeo\.com"
+FORMATS="youtube.com buzzsprout.com \.mp4 \.avi \.webm \.ogv rtmp:// \.mp3 \
+         \.ogm \.flac \.mkv \.m3u8 magnet: youtu.be vimeo\.com"
 
 # Should we launch some tests?
 DEBUG=false
@@ -28,6 +28,20 @@ P2PLAYER="peerflix -k"
 
 www.youtube.com() {
     "$PLAYER" $PLAYER_FLAGS --ytdl-format="22" "$1" \
+    || "$PLAYER" $PLAYER_FLAGS --ytdl-format="232+233" "$1" \
+    && return
+
+    formats="$(youtube-dl -F 'https://www.youtube.com/watch?v=9Looe6qKKIQ')"
+    vidfmt="$(echo "$formats" \
+             | grep "1280x720" \
+             | head -1 \
+             | cut -d ' ' -f 1)"
+    audfmt="$(echo "$formats" \
+             | grep "audio only.*opus" \
+             | head -1 \
+             | cut -d ' ' -f 1)"
+
+    "$PLAYER" $PLAYER_FLAGS --ytdl-format="$vidfmt+$audfmt" "$1" \
     || "$PLAYER" $PLAYER_FLAGS --ytdl-format="best" "$1" \
     || "$PLAYER" $PLAYER_FLAGS "$1"
 }
@@ -44,6 +58,10 @@ www.chess.com() {
     | cut -d '&' -f 1 \
     | tr -d '\n' \
     | xargs -0 "$PLAYER" $PLAYER_FLAGS
+}
+
+securitycryptographywhatever.com() {
+    "$PLAYER" $PLAYER_FLAGS "$(curl -s "$1" | qgrep buzzsprout)"
 }
 
 livecoding.tv() {
@@ -116,6 +134,8 @@ www.xanimeporn.com() {
 }
 
 www.pornhub.com() {
+    "$PLAYER" $PLAYER_FLAGS -- "$1" && return
+
     youtube-dl -o - "$1" | "$PLAYER" $PLAYER_FLAGS - \
     || "$PLAYER" $PLAYER_FLAGS "$1"
 }
